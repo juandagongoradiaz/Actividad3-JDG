@@ -8,19 +8,17 @@ public class LeaderBoardManager : MonoBehaviour
 {
     int score;
     [HideInInspector] public int highScore;
-    [SerializeField] ScoreManager scoreManager;
+    [SerializeField] GameManager gameManager;
     [SerializeField] TMP_Text highScoreText;
     [SerializeField] FirebaseManager authManager;
-    public GameObject StartGameUI;
-    public GameObject Hide; 
     public UnityEvent updateAuth;
 
-    public void Fabiola()
+    public void UpdateScore()
     {
         
         {
             Debug.Log("Score esperado: " + score); 
-            score = scoreManager.score;
+            score = gameManager.score;
             if (score > highScore)
             {
                 highScore = score;
@@ -28,15 +26,11 @@ public class LeaderBoardManager : MonoBehaviour
                 updateAuth.Invoke();
             }
             score = 0;
-            ReloadScene();
+           
         }
     }
 
-    private void ReloadScene()
-    {
-        StartGameUI.SetActive(true);
-        Hide.SetActive(false);
-    }
+ 
 
 }
 
