@@ -508,7 +508,7 @@ GameObject:
   - component: {fileID: 260667773}
   - component: {fileID: 260667772}
   m_Layer: 0
-  m_Name: LooseManager
+  m_Name: LeaderBoardManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4075,7 +4075,7 @@ GameObject:
   - component: {fileID: 1933238885}
   - component: {fileID: 1933238884}
   m_Layer: 0
-  m_Name: Manager
+  m_Name: ScoreManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

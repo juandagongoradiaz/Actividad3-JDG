@@ -44,7 +44,7 @@ public class FirebaseManager : MonoBehaviour
    
     [SerializeField] GameObject gameUI, menuUI, loginUI, registerUI, passUI;
     [SerializeField] TMP_Text highScore;
-    [SerializeField] LoseManager highScoreIntern;
+    [SerializeField] LeaderBoardManager highScoreIntern;
 
 
     private void Awake()

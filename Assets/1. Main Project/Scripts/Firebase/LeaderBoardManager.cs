@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using TMPro;
 
-public class LoseManager : MonoBehaviour
+public class LeaderBoardManager : MonoBehaviour
 {
     int score;
     [HideInInspector] public int highScore;
