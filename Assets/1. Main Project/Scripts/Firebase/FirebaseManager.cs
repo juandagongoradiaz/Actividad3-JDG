@@ -42,7 +42,7 @@ public class FirebaseManager : MonoBehaviour
 
     [Header("Game")]
    
-    [SerializeField] GameObject gameUI, menuUI, scoreboardUI;
+    [SerializeField] GameObject gameUI, menuUI;
     [SerializeField] TMP_Text highScore;
     [SerializeField] LoseManager highScoreIntern;
 
@@ -171,7 +171,7 @@ public class FirebaseManager : MonoBehaviour
 
             UIManager.instance.RemoveAuth();
             gameUI.SetActive(true);
-            menuUI.SetActive(true);
+            menuUI.SetActive(false);
            
         }
     }
@@ -290,10 +290,6 @@ public class FirebaseManager : MonoBehaviour
                 scoreboardElement.GetComponent<ScoreElement>().NewScoreElement(username, score);
             }
         }
-
-        scoreboardUI.SetActive(true);
-        gameUI.SetActive(false);
-        menuUI.SetActive(false);
        
     }
 }
