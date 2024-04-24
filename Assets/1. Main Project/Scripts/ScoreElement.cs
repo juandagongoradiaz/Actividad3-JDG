@@ -6,8 +6,6 @@ using TMPro;
 public class ScoreElement : MonoBehaviour
 {
 
-  
-
     public TMP_Text usernameText;
     public TMP_Text scoreText;
 
