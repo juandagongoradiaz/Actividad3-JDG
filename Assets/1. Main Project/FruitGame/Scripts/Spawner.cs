@@ -9,8 +9,8 @@ public class Spawner : MonoBehaviour
     public GameObject[] fruitPrefabs;
     public GameObject bombPrefab;
 
-    [Range(0f, 0.7f)] public float maxBombChance = 0.7f;
-    public float currentBombChance = 0.05f; 
+    public float maxBombChance = 0.5f;
+    [Range(0f, 1f)] public float currentBombChance = 0.05f; 
 
     public float minSpawnDelay = 0.25f;
     public float maxSpawnDelay = 1f;

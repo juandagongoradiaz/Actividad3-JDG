@@ -273,26 +273,42 @@ public class FirebaseManager : MonoBehaviour
     IEnumerator LoadScoreBoard()
     {
         var DBTask = dbReference.Child("users").OrderByChild("score").GetValueAsync();
-
         yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
 
-        if (DBTask.Exception != null) Debug.LogWarning($"Fallo en registrar la tarea {DBTask.Exception}");
+        if (DBTask.Exception != null)
+        {
+            Debug.LogWarning($"Fallo al registrar la tarea {DBTask.Exception}");
+        }
         else
         {
             DataSnapshot snapshot = DBTask.Result;
+            List<KeyValuePair<string, int>> sortedScores = new List<KeyValuePair<string, int>>();
 
-            foreach (Transform child in scoreboardContent.transform) Destroy(child.gameObject);
-            
-            foreach (DataSnapshot childSnapshot in snapshot.Children.Reverse<DataSnapshot>())
+            foreach (DataSnapshot childSnapshot in snapshot.Children)
             {
                 string username = childSnapshot.Child("username").Value.ToString();
                 int score = int.Parse(childSnapshot.Child("score").Value.ToString());
-                Debug.Log("a");
+                sortedScores.Add(new KeyValuePair<string, int>(username, score));
+            }
+
+            // Ordenar la lista por puntaje de forma descendente
+            sortedScores.Sort((x, y) => y.Value.CompareTo(x.Value));
+
+            foreach (Transform child in scoreboardContent.transform)
+            {
+                Destroy(child.gameObject);
+            }
+
+            foreach (var kvp in sortedScores)
+            {
+                string username = kvp.Key;
+                int score = kvp.Value;
                 GameObject scoreboardElement = Instantiate(scoreElement, scoreboardContent);
                 scoreboardElement.GetComponent<ScoreElement>().NewScoreElement(username, score);
             }
         }
-       
     }
+
 }
+
 

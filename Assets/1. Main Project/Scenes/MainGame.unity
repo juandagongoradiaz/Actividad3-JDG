@@ -3646,7 +3646,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
-      - m_Target: {fileID: 1127849851}
+      - m_Target: {fileID: 2021425179}
         m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
         m_MethodName: SetActive
         m_Mode: 6
@@ -4327,7 +4327,7 @@ MonoBehaviour:
   Spawner: {fileID: 7524293721695033110}
   StartGameUI: {fileID: 1172072203}
   Game: {fileID: 5634372864182514981}
-  Canvas: {fileID: 1127849851}
+  Canvas: {fileID: 2021425179}
   score: 0
 --- !u!4 &914459896320888136
 Transform:
