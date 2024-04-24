@@ -14,6 +14,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private LeaderBoardManager leaderBoardManager;
     [SerializeField] private FirebaseManager fireBaseManager;
     [SerializeField] private Spawner Spawner;
+    [SerializeField] private AudioManager audioManager; 
+
+
 
 
     public GameObject StartGameUI;
@@ -46,6 +49,9 @@ public class GameManager : MonoBehaviour
     private void NewGame()
     {
         Time.timeScale = 1f;
+        Color newColor = fadeImage.color;
+        newColor.a = 0f; 
+        fadeImage.color = newColor;
 
         ClearScene();
 
@@ -83,6 +89,7 @@ public class GameManager : MonoBehaviour
     {
         blade.enabled = false;
         spawner.enabled = false;
+        audioManager.EndGame();
 
         StartCoroutine(ExplodeSequence());
     }
@@ -94,7 +101,7 @@ public class GameManager : MonoBehaviour
         leaderBoardManager.UpdateScore();
         fireBaseManager.ScoreBoardButton();
         audioSource.PlayOneShot(explode);
-
+      
         yield return new WaitForSecondsRealtime(1f);
 
         // Fade to white
