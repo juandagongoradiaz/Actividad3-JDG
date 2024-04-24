@@ -23,6 +23,10 @@ public class Spawner : MonoBehaviour
 
     public float maxLifetime = 5f;
 
+    public AudioSource audioSource;
+
+    public AudioClip sound;
+
     private void Awake()
     {
         spawnArea = GetComponent<Collider>();
@@ -66,6 +70,9 @@ public class Spawner : MonoBehaviour
 
             float force = Random.Range(minForce, maxForce);
             fruit.GetComponent<Rigidbody>().AddForce(fruit.transform.up * force, ForceMode.Impulse);
+
+            audioSource.PlayOneShot(sound); 
+
 
             yield return new WaitForSeconds(Random.Range(minSpawnDelay, maxSpawnDelay));
         }

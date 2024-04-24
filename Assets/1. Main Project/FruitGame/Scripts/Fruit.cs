@@ -8,6 +8,9 @@ public class Fruit : MonoBehaviour
     private Rigidbody fruitRigidbody;
     private Collider fruitCollider;
     private ParticleSystem juiceEffect;
+    private AudioSource audioSource;
+
+    public AudioClip sound; 
 
     public int points = 1;
 
@@ -16,11 +19,13 @@ public class Fruit : MonoBehaviour
         fruitRigidbody = GetComponent<Rigidbody>();
         fruitCollider = GetComponent<Collider>();
         juiceEffect = GetComponentInChildren<ParticleSystem>();
+        audioSource = GetComponent<AudioSource>(); 
     }
 
     private void Slice(Vector3 direction, Vector3 position, float force)
     {
         GameManager.Instance.IncreaseScore(points);
+        audioSource.PlayOneShot(sound); 
 
         // Disable the whole fruit
         fruitCollider.enabled = false;

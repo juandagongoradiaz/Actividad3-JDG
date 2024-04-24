@@ -15,11 +15,30 @@ public class Blade : MonoBehaviour
     private bool slicing;
     public bool Slicing => slicing;
 
+    public AudioClip[] sounds;
+
+    public AudioSource audioSource;
+
     private void Awake()
     {
         mainCamera = Camera.main;
         sliceCollider = GetComponent<Collider>();
         sliceTrail = GetComponentInChildren<TrailRenderer>();
+    }
+
+  
+
+    public void PlayRandomSound()
+    {
+        if (sounds.Length == 0)
+        {
+            Debug.LogError("No hay sonidos disponibles para reproducir.");
+            return;
+        }
+
+        int randomIndex = Random.Range(0, sounds.Length);
+        audioSource.clip = sounds[randomIndex];
+        audioSource.Play();
     }
 
     private void OnEnable()
@@ -45,6 +64,7 @@ public class Blade : MonoBehaviour
 
     private void StartSlice()
     {
+        PlayRandomSound(); 
         Vector3 position = mainCamera.ScreenToWorldPoint(Input.mousePosition);
         position.z = 0f;
         transform.position = position;
