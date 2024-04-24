@@ -1015,7 +1015,7 @@ Transform:
   m_GameObject: {fileID: 549543074}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 12.494168, y: -8.775058, z: 5.7}
+  m_LocalPosition: {x: 12.494168, y: -8.775058, z: 1.1}
   m_LocalScale: {x: 2.265035, y: 2.124376, z: 2.265035}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3339,7 +3339,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: 60b9462bc6407e14eaea16a94ce4bb73, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 0.2
   m_Pitch: 1
@@ -4777,6 +4777,8 @@ MonoBehaviour:
   StartGameUI: {fileID: 1172072203}
   Game: {fileID: 5634372864182514981}
   Canvas: {fileID: 2021425179}
+  audioSource: {fileID: 2098858106}
+  explode: {fileID: 8300000, guid: 9fc2164b71e09ee4eb1f918a6d61746f, type: 3}
   score: 0
 --- !u!4 &914459896320888136
 Transform:
@@ -11554,7 +11556,7 @@ MonoBehaviour:
   minForce: 18
   maxForce: 22
   maxLifetime: 5
-  audioSource: {fileID: 1319096203}
+  audioSource: {fileID: 2098858106}
   sound: {fileID: 8300000, guid: f92927d8fea8e3e469c471f2be2f713a, type: 3}
 --- !u!65 &7872980649716981576
 BoxCollider:

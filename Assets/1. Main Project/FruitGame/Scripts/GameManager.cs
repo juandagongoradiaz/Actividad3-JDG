@@ -20,6 +20,8 @@ public class GameManager : MonoBehaviour
     public GameObject Game;
     public GameObject Canvas;
 
+    public AudioSource audioSource;
+    public AudioClip explode;
 
 
     public int score;
@@ -91,6 +93,9 @@ public class GameManager : MonoBehaviour
         float duration = 0.5f;
         leaderBoardManager.UpdateScore();
         fireBaseManager.ScoreBoardButton();
+        audioSource.PlayOneShot(explode);
+
+        yield return new WaitForSecondsRealtime(1f);
 
         // Fade to white
         while (elapsed < duration)
