@@ -42,7 +42,7 @@ public class FirebaseManager : MonoBehaviour
 
     [Header("Game")]
    
-    [SerializeField] GameObject gameUI, menuUI;
+    [SerializeField] GameObject gameUI, menuUI, loginUI, registerUI, passUI;
     [SerializeField] TMP_Text highScore;
     [SerializeField] LoseManager highScoreIntern;
 
@@ -115,7 +115,8 @@ public class FirebaseManager : MonoBehaviour
             }
 
             confirmationPasswordText.text = "El correo para reestablecer la contraseña ha sido enviado";
-            UIManager.instance.LoginScreen();
+            loginUI.SetActive(true);
+            passUI.SetActive(false);
         });
     }
 
@@ -160,7 +161,7 @@ public class FirebaseManager : MonoBehaviour
         {
             confirmationPasswordText.text = "";
             user = LoginTask.Result.User;
-            Debug.LogFormat("Usuario iniciado excitosamente: {0} ({1})", user.DisplayName, user.Email);
+            Debug.LogFormat("Usuario iniciado exitosamente: {0} ({1})", user.DisplayName, user.Email);
             warningLoginText.text = "";
 
             StartCoroutine(LoadData());
@@ -169,7 +170,6 @@ public class FirebaseManager : MonoBehaviour
 
             usernameField.text = user.DisplayName;
 
-            UIManager.instance.RemoveAuth();
             gameUI.SetActive(true);
             menuUI.SetActive(false);
            
@@ -233,7 +233,9 @@ public class FirebaseManager : MonoBehaviour
                     {
                         var DBTask = dbReference.Child("users").Child(user.UserId).Child("username").SetValueAsync(username);
                         DBTask = dbReference.Child("users").Child(user.UserId).Child("score").SetValueAsync(0.ToString());
-                        UIManager.instance.LoginScreen();
+                        registerUI.SetActive(false);
+                        loginUI.SetActive(true);
+                        
                         warningRegisterText.text = "";
                     }
                 }
@@ -264,7 +266,7 @@ public class FirebaseManager : MonoBehaviour
             DataSnapshot snapshot = DBTask.Result;
 
             highScore.text = snapshot.Child("score").Value.ToString();
-            highScoreIntern.highScore = int.Parse(highScore.text);
+            //highScoreIntern.highScore = int.Parse(highScore.text);
         }
     }
 
