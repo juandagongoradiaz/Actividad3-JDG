@@ -9,17 +9,17 @@ public class LoseManager : MonoBehaviour
     int score;
     [HideInInspector] public int highScore;
     [SerializeField] ScoreManager scoreManager;
-   
-    [SerializeField] GameObject menuUI;
     [SerializeField] TMP_Text highScoreText;
-    [SerializeField] UIController scoreText;
     [SerializeField] FirebaseManager authManager;
+    public GameObject StartGameUI;
+    public GameObject Hide; 
     public UnityEvent updateAuth;
 
     public void Fabiola()
     {
         
         {
+            Debug.Log("Score esperado: " + score); 
             score = scoreManager.score;
             if (score > highScore)
             {
@@ -34,10 +34,8 @@ public class LoseManager : MonoBehaviour
 
     private void ReloadScene()
     {
-        scoreManager.DeleteScore();
-        scoreText.scoreText.text = "0";
-       
-        menuUI.SetActive(true);
+        StartGameUI.SetActive(true);
+        Hide.SetActive(false);
     }
 
 }

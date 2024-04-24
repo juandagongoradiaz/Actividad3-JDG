@@ -136,20 +136,20 @@ public class FirebaseManager : MonoBehaviour
             FirebaseException firebaseEx = LoginTask.Exception.GetBaseException() as FirebaseException;
             AuthError errorCode = (AuthError)firebaseEx.ErrorCode;
 
-            string message = "Ingreso Fallido!";
+            string message = "¡Ingreso Fallido!";
             switch (errorCode)
             {
                 case AuthError.MissingEmail:
-                    message = "Falta correo";
+                    message = "Falta ingresar el correo electrónico";
                     break;
                 case AuthError.MissingPassword:
-                    message = "Falta contraseña";
+                    message = "Falta ingresar la contraseña";
                     break;
                 case AuthError.WrongPassword:
                     message = "Contraseña incorrecta";
                     break;
                 case AuthError.InvalidEmail:
-                    message = "Correo invalido";
+                    message = "Correo electrónico invalido";
                     break;
                 case AuthError.UserNotFound:
                     message = "Usuario no encontrado";
@@ -169,7 +169,7 @@ public class FirebaseManager : MonoBehaviour
             yield return new WaitForSeconds(1);
 
             usernameField.text = user.DisplayName;
-
+            ScoreBoardButton(); 
             gameUI.SetActive(true);
             menuUI.SetActive(false);
            
@@ -178,7 +178,7 @@ public class FirebaseManager : MonoBehaviour
 
     IEnumerator Register(string email, string password, string username)
     {
-        if (username == "") warningRegisterText.text = "Falta usuario";
+        if (username == "") warningRegisterText.text = "Falta ingresar el usuario";
         else if (passwordRegisterField.text != passwordRegisterVerifyField.text) warningRegisterText.text = "Las contraseñas no coinciden";
         else
         {
@@ -196,16 +196,16 @@ public class FirebaseManager : MonoBehaviour
                 switch (errorCode)
                 {
                     case AuthError.MissingEmail:
-                        message = "Falta correo";
+                        message = "Falta ingresar el correo electrónico";
                         break;
                     case AuthError.MissingPassword:
-                        message = "Falta contraseña";
+                        message = "Falta ingresar la contraseña";
                         break;
                     case AuthError.WeakPassword:
                         message = "Contraseña debil";
                         break;
                     case AuthError.EmailAlreadyInUse:
-                        message = "Correo ya en uso";
+                        message = "Correo electrónico ya en uso";
                         break;
                 }
                 warningRegisterText.text = message;
@@ -266,7 +266,7 @@ public class FirebaseManager : MonoBehaviour
             DataSnapshot snapshot = DBTask.Result;
 
             highScore.text = snapshot.Child("score").Value.ToString();
-            //highScoreIntern.highScore = int.Parse(highScore.text);
+            highScoreIntern.highScore = int.Parse(highScore.text);
         }
     }
 
