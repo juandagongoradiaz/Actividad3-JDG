@@ -1,5 +1,8 @@
+using System.Collections;
 using UnityEngine;
 using TMPro;
+
+
 
 public class NotificationScript : MonoBehaviour
 {
@@ -10,10 +13,12 @@ public class NotificationScript : MonoBehaviour
     {
         usernameText.text = username;
         gameObject.SetActive(true); // Asegúrate de activar el objeto cuando se configura
+        Destroy(gameObject, 3f);
     }
 
     public void SetStatus(bool isOnline)
     {
         statusText.text = isOnline ? "Se ha conectado" : "Se ha desconectado";
     }
+
 }

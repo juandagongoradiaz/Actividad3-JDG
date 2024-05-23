@@ -488,7 +488,8 @@ public class FirebaseManager : MonoBehaviour
                     if (isOnline)
                     {
                         GameObject notificationInstance = Instantiate(notificationPrefab, notificationTransform);
-                        // Aquí puedes agregar código para configurar el texto del prefab de notificación
+                        NotificationScript notificationScript = notificationInstance.GetComponent<NotificationScript>();
+                        notificationScript.SetUp(friendUsername);
                     }
                 }
                 else
