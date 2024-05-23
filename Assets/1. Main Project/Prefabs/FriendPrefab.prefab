@@ -456,3 +456,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   usernameText: {fileID: 7731893825994009507}
+  statusText: {fileID: 5766657370067540043}

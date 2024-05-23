@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Firebase;
 using Firebase.Auth;
@@ -57,14 +56,38 @@ public class FirebaseManager : MonoBehaviour
 
     private void Awake()
     {
-
-
         FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
         {
             dependencyStatus = task.Result;
-            if (dependencyStatus == DependencyStatus.Available) InitializeFirebase();
-            else print($"No se pueden resolver todas las dependencias de Firebase: {dependencyStatus}");
+            if (dependencyStatus == DependencyStatus.Available)
+            {
+                InitializeFirebase();
+                auth.StateChanged += AuthStateChanged;
+            }
+            else
+            {
+                print($"No se pueden resolver todas las dependencias de Firebase: {dependencyStatus}");
+            }
         });
+    }
+
+    private void AuthStateChanged(object sender, System.EventArgs eventArgs)
+    {
+        if (auth.CurrentUser != user)
+        {
+            bool signedIn = user != auth.CurrentUser && auth.CurrentUser != null;
+            if (!signedIn && user != null)
+            {
+                // El usuario ha cerrado sesión
+                dbReference.Child("users").Child(user.UserId).Child("status").SetValueAsync(false);
+            }
+            user = auth.CurrentUser;
+            if (signedIn)
+            {
+                // El usuario ha iniciado sesión
+                dbReference.Child("users").Child(user.UserId).Child("status").SetValueAsync(true);
+            }
+        }
     }
 
     void InitializeFirebase()
@@ -95,7 +118,13 @@ public class FirebaseManager : MonoBehaviour
         FogotPassword(forgotPasswordEmail.text);
     }
 
-  
+    private void OnApplicationQuit()
+    {
+        Debug.Log("El usuario ha salido"); 
+        Logout();
+    }
+
+
 
     void FogotPassword(string forgotPasswordEmail)
     {
@@ -167,7 +196,8 @@ public class FirebaseManager : MonoBehaviour
             Debug.LogFormat("Usuario iniciado exitosamente: {0} ({1})", user.DisplayName, user.Email);
             warningLoginText.text = "";
 
-         
+            // Actualizar estado en Firebase
+            dbReference.Child("users").Child(user.UserId).Child("status").SetValueAsync(true);
 
             yield return new WaitForSeconds(1);
 
@@ -176,7 +206,6 @@ public class FirebaseManager : MonoBehaviour
             LoadFriendList();
             gameUI.SetActive(true);
             menuUI.SetActive(false);
-           
         }
     }
 
@@ -431,7 +460,41 @@ public class FirebaseManager : MonoBehaviour
 
             string friendUsername = friendUsernameTask.Result.Value.ToString();
             GameObject friendElement = Instantiate(friendElementPrefab, friendListContent);
-            friendElement.GetComponent<FriendElement>().SetUp(friendUsername);
+            FriendElement friendElementScript = friendElement.GetComponent<FriendElement>();
+            friendElementScript.SetUp(friendUsername);
+
+            // Listen for online status
+            dbReference.Child("users").Child(friendId).Child("status").ValueChanged += (sender, args) =>
+            {
+                if (args.DatabaseError != null)
+                {
+                    Debug.LogError(args.DatabaseError.Message);
+                    return;
+                }
+
+                if (args.Snapshot != null && args.Snapshot.Value != null)
+                {
+                    bool isOnline = (bool)args.Snapshot.Value;
+                    friendElementScript.SetStatus(isOnline);
+                }
+                else
+                {
+                    Debug.LogWarning("El nodo 'status' para este amigo está vacío o no existe.");
+                    // Aquí puedes manejar el caso en el que el nodo 'status' esté vacío o no exista
+                    // Por ejemplo, podrías establecer el estado en línea como desconocido o fuera de línea
+                }
+            };
+        }
+    }
+
+    public void Logout()
+    {
+        if (user != null)
+        {
+            dbReference.Child("users").Child(user.UserId).Child("status").SetValueAsync(false);
+            auth.SignOut();
+            user = null;
+            // Actualiza la UI y otros elementos necesarios al cerrar sesión
         }
     }
 }
