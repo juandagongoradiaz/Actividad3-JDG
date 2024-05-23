@@ -92,7 +92,7 @@ public class FirebaseManager : MonoBehaviour
     {
         if (string.IsNullOrEmpty(forgotPasswordEmail.text))
         {
-            warningForgetPasswordText.text = $"No has colocado correo electronico";
+            warningForgetPasswordText.text = $"Falta ingresar el correo electrónico";
             return;
         }
 
@@ -106,11 +106,13 @@ public class FirebaseManager : MonoBehaviour
 
     void FogotPassword(string forgotPasswordEmail)
     {
+        warningLoginText.text = ""; 
+        warningRegisterText.text = ""; 
         auth.SendPasswordResetEmailAsync(forgotPasswordEmail).ContinueWithOnMainThread(RestoreTask => {
 
             if (RestoreTask.IsCanceled)
             {
-                Debug.LogError($"El cambio de contraseña ha sido cancelado");
+                Debug.LogError($"El cambio de contraseña ha sido cancelado.");
             }
 
             else if (RestoreTask.IsFaulted)
@@ -126,7 +128,7 @@ public class FirebaseManager : MonoBehaviour
                 }
             }
 
-            confirmationPasswordText.text = "El correo para reestablecer la contraseña ha sido enviado";
+            confirmationPasswordText.text = "El correo para reestablecer la contraseña ha sido enviado.";
             loginUI.SetActive(true);
             passUI.SetActive(false);
         });
@@ -152,19 +154,19 @@ public class FirebaseManager : MonoBehaviour
             switch (errorCode)
             {
                 case AuthError.MissingEmail:
-                    message = "Falta ingresar el correo electrónico";
+                    message = "Falta ingresar el correo electrónico.";
                     break;
                 case AuthError.MissingPassword:
-                    message = "Falta ingresar la contraseña";
+                    message = "Falta ingresar la contraseña.";
                     break;
                 case AuthError.WrongPassword:
-                    message = "Contraseña incorrecta";
+                    message = "Contraseña incorrecta.";
                     break;
                 case AuthError.InvalidEmail:
-                    message = "Correo electrónico invalido";
+                    message = "Correo electrónico inválido.";
                     break;
                 case AuthError.UserNotFound:
-                    message = "Usuario no encontrado";
+                    message = "Usuario no encontrado.";
                     break;
             }
             warningLoginText.text = message;
@@ -192,7 +194,7 @@ public class FirebaseManager : MonoBehaviour
 
     IEnumerator Register(string email, string password, string username)
     {
-        if (username == "") warningRegisterText.text = "Falta ingresar el usuario";
+        if (username == "") warningRegisterText.text = "Falta ingresar el usuario.";
         else if (passwordRegisterField.text != passwordRegisterVerifyField.text) warningRegisterText.text = "Las contraseñas no coinciden";
         else
         {
@@ -210,16 +212,16 @@ public class FirebaseManager : MonoBehaviour
                 switch (errorCode)
                 {
                     case AuthError.MissingEmail:
-                        message = "Falta ingresar el correo electrónico";
+                        message = "Falta ingresar el correo electrónico.";
                         break;
                     case AuthError.MissingPassword:
                         message = "Falta ingresar la contraseña";
                         break;
                     case AuthError.WeakPassword:
-                        message = "Contraseña debil";
+                        message = "Contraseña débil.";
                         break;
                     case AuthError.EmailAlreadyInUse:
-                        message = "Correo electrónico ya en uso";
+                        message = "Correo electrónico ya en uso.";
                         break;
                 }
                 warningRegisterText.text = message;
