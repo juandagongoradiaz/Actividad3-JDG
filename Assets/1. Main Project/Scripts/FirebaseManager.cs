@@ -37,14 +37,10 @@ public class FirebaseManager : MonoBehaviour
 
     [Header("UserData")]
     [SerializeField] TMP_Text usernameField;
-    [SerializeField] GameObject scoreElement;
-    [SerializeField] Transform scoreboardContent;
 
     [Header("Game")]
    
     [SerializeField] GameObject gameUI, menuUI, loginUI, registerUI, passUI;
-    [SerializeField] TMP_Text highScore;
-    [SerializeField] LeaderBoardManager highScoreIntern;
 
 
     [Header("Friend Request")]
@@ -99,10 +95,7 @@ public class FirebaseManager : MonoBehaviour
         FogotPassword(forgotPasswordEmail.text);
     }
 
-    public void ScoreBoardButton()
-    {
-        StartCoroutine(LoadScoreBoard());
-    }
+  
 
     void FogotPassword(string forgotPasswordEmail)
     {
@@ -134,10 +127,6 @@ public class FirebaseManager : MonoBehaviour
         });
     }
 
-    public void UpdateScore()
-    {
-        StartCoroutine(Score(int.Parse(highScore.text)));
-    }
     IEnumerator Login(string email, string password)
     {
         var LoginTask = auth.SignInWithEmailAndPasswordAsync(email, password);
@@ -178,12 +167,11 @@ public class FirebaseManager : MonoBehaviour
             Debug.LogFormat("Usuario iniciado exitosamente: {0} ({1})", user.DisplayName, user.Email);
             warningLoginText.text = "";
 
-            StartCoroutine(LoadData());
+         
 
             yield return new WaitForSeconds(1);
 
             usernameField.text = user.DisplayName;
-            ScoreBoardButton();
             LoadFriendRequests();
             LoadFriendList();
             gameUI.SetActive(true);
@@ -259,72 +247,8 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
-    IEnumerator Score(int score)
-    {
-        var DBTask = dbReference.Child("users").Child(user.UserId).Child("score").SetValueAsync(score);
 
-        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
 
-        if (DBTask.Exception != null) Debug.LogWarning($"Fallo al registrar la tarea {DBTask.Exception}");
-    }
-
-    IEnumerator LoadData()
-    {
-        var DBTask = dbReference.Child("users").Child(user.UserId).GetValueAsync();
-        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
-
-        if (DBTask.Result.Value == null)
-        {
-            highScore.text = "0";
-        }
-        else
-        {
-            DataSnapshot snapshot = DBTask.Result;
-
-            highScore.text = snapshot.Child("score").Value.ToString();
-            highScoreIntern.highScore = int.Parse(highScore.text);
-        }
-    }
-
-    IEnumerator LoadScoreBoard()
-    {
-        var DBTask = dbReference.Child("users").OrderByChild("score").GetValueAsync();
-        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
-
-        if (DBTask.Exception != null)
-        {
-            Debug.LogWarning($"Fallo al registrar la tarea {DBTask.Exception}");
-        }
-        else
-        {
-            DataSnapshot snapshot = DBTask.Result;
-            List<KeyValuePair<string, int>> sortedScores = new List<KeyValuePair<string, int>>();
-
-            foreach (DataSnapshot childSnapshot in snapshot.Children)
-            {
-                string username = childSnapshot.Child("username").Value.ToString();
-                int score = int.Parse(childSnapshot.Child("score").Value.ToString());
-                sortedScores.Add(new KeyValuePair<string, int>(username, score));
-            }
-
-            // Ordenar la lista por puntaje de forma descendente
-            sortedScores.Sort((x, y) => y.Value.CompareTo(x.Value));
-
-            foreach (Transform child in scoreboardContent.transform)
-            {
-                Destroy(child.gameObject);
-            }
-
-            foreach (var kvp in sortedScores)
-            {
-                string username = kvp.Key;
-                int score = kvp.Value;
-                GameObject scoreboardElement = Instantiate(scoreElement, scoreboardContent);
-                scoreboardElement.GetComponent<ScoreElement>().NewScoreElement(username, score);
-            }
-        }
-
-    }
     public void SendFriendRequest()
     {
         string friendUsername = friendUsernameField.text;
