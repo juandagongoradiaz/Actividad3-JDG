@@ -55,6 +55,9 @@ public class FirebaseManager : MonoBehaviour
     [SerializeField] private GameObject friendRequestElementPrefab;
     [SerializeField] private Transform friendRequestContent;
 
+    [Header("Friend List Panel")]
+    [SerializeField] private GameObject friendElementPrefab;
+    [SerializeField] private Transform friendListContent;
 
     private void Awake()
     {
@@ -179,7 +182,8 @@ public class FirebaseManager : MonoBehaviour
 
             usernameField.text = user.DisplayName;
             ScoreBoardButton();
-            LoadFriendRequests(); 
+            LoadFriendRequests();
+            LoadFriendList();
             gameUI.SetActive(true);
             menuUI.SetActive(false);
            
@@ -437,6 +441,9 @@ public class FirebaseManager : MonoBehaviour
                 Debug.LogWarning($"Failed to accept friend request: {addReverseFriendTask.Exception}");
                 yield break;
             }
+
+            // Actualizar la lista de amigos después de aceptar la solicitud
+            LoadFriendList();
         }
 
         // Eliminar la solicitud de amistad
@@ -451,6 +458,54 @@ public class FirebaseManager : MonoBehaviour
         {
             Debug.Log("Friend request handled successfully");
             LoadFriendRequests(); // Recargar solicitudes de amistad
+        }
+    }
+
+    public void LoadFriendList()
+    {
+        if (user == null)
+        {
+            Debug.LogWarning("No user is signed in");
+            return;
+        }
+
+        StartCoroutine(LoadFriendListCoroutine());
+    }
+
+    IEnumerator LoadFriendListCoroutine()
+    {
+        var friendListTask = dbReference.Child("friends").Child(user.UserId).GetValueAsync();
+        yield return new WaitUntil(() => friendListTask.IsCompleted);
+
+        if (friendListTask.Exception != null)
+        {
+            Debug.LogWarning($"Failed to load friend list: {friendListTask.Exception}");
+            yield break;
+        }
+
+        DataSnapshot snapshot = friendListTask.Result;
+        foreach (Transform child in friendListContent)
+        {
+            Destroy(child.gameObject);
+        }
+
+        foreach (DataSnapshot friendSnapshot in snapshot.Children)
+        {
+            string friendId = friendSnapshot.Key;
+
+            // Get friend's username
+            var friendUsernameTask = dbReference.Child("users").Child(friendId).Child("username").GetValueAsync();
+            yield return new WaitUntil(() => friendUsernameTask.IsCompleted);
+
+            if (friendUsernameTask.Exception != null)
+            {
+                Debug.LogWarning($"Failed to get friend's username: {friendUsernameTask.Exception}");
+                continue;
+            }
+
+            string friendUsername = friendUsernameTask.Result.Value.ToString();
+            GameObject friendElement = Instantiate(friendElementPrefab, friendListContent);
+            friendElement.GetComponent<FriendElement>().SetUp(friendUsername);
         }
     }
 }
