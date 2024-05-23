@@ -140,7 +140,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: QuantumBreak
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0d0071b9b060bd64eab8e6d14498228f, type: 2}
   m_sharedMaterial: {fileID: 686224360789379318, guid: 0d0071b9b060bd64eab8e6d14498228f, type: 2}

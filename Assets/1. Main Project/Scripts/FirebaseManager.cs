@@ -54,6 +54,12 @@ public class FirebaseManager : MonoBehaviour
     [SerializeField] private GameObject friendElementPrefab;
     [SerializeField] private Transform friendListContent;
 
+
+    [Header("Notification")]
+
+    [SerializeField] private GameObject notificationPrefab;
+    [SerializeField] private Transform notificationTransform;
+
     private void Awake()
     {
         FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
@@ -448,6 +454,7 @@ public class FirebaseManager : MonoBehaviour
         {
             string friendId = friendSnapshot.Key;
 
+
             // Get friend's username
             var friendUsernameTask = dbReference.Child("users").Child(friendId).Child("username").GetValueAsync();
             yield return new WaitUntil(() => friendUsernameTask.IsCompleted);
@@ -476,6 +483,13 @@ public class FirebaseManager : MonoBehaviour
                 {
                     bool isOnline = (bool)args.Snapshot.Value;
                     friendElementScript.SetStatus(isOnline);
+
+                    // Instancia el prefab de notificación si el amigo está en línea
+                    if (isOnline)
+                    {
+                        GameObject notificationInstance = Instantiate(notificationPrefab, notificationTransform);
+                        // Aquí puedes agregar código para configurar el texto del prefab de notificación
+                    }
                 }
                 else
                 {
