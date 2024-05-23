@@ -47,6 +47,12 @@ public class FirebaseManager : MonoBehaviour
     [SerializeField] LeaderBoardManager highScoreIntern;
 
 
+    [Header("Friend Request")]
+    [SerializeField] private TMP_InputField friendUsernameField;
+    [SerializeField] private TMP_Text friendRequestStatusText;
+
+
+
     private void Awake()
     {
 
@@ -307,8 +313,59 @@ public class FirebaseManager : MonoBehaviour
                 scoreboardElement.GetComponent<ScoreElement>().NewScoreElement(username, score);
             }
         }
+
+    }
+    public void SendFriendRequest()
+    {
+        string friendUsername = friendUsernameField.text;
+        if (string.IsNullOrEmpty(friendUsername))
+        {
+            friendRequestStatusText.text = "Por favor, ingresa el nombre del usuario.";
+            return;
+        }
+
+        StartCoroutine(SendFriendRequestCoroutine(friendUsername));
     }
 
+    IEnumerator SendFriendRequestCoroutine(string friendUsername)
+    {
+        // Verificar que el usuario está autenticado
+        if (user == null)
+        {
+            friendRequestStatusText.text = "Debes iniciar sesión para enviar solicitudes de amistad.";
+            yield break;
+        }
+
+        // Buscar el usuario en la base de datos
+        var userQuery = dbReference.Child("users").OrderByChild("username").EqualTo(friendUsername).GetValueAsync();
+        yield return new WaitUntil(() => userQuery.IsCompleted);
+
+        if (userQuery.Result.Exists && userQuery.Result.Children.Count() > 0)
+        {
+            DataSnapshot snapshot = userQuery.Result.Children.FirstOrDefault();
+            string friendUserId = snapshot.Key;
+
+            // Enviar la solicitud de amistad
+            var friendRequestTask = dbReference.Child("friend_requests").Child(friendUserId).Child(user.UserId).SetValueAsync(user.DisplayName);
+            yield return new WaitUntil(() => friendRequestTask.IsCompleted);
+
+            if (friendRequestTask.Exception != null)
+            {
+                friendRequestStatusText.text = "Error al enviar la solicitud de amistad.";
+                Debug.LogWarning($"Failed to send friend request: {friendRequestTask.Exception}");
+            }
+            else
+            {
+                friendRequestStatusText.text = "Solicitud de amistad enviada exitosamente.";
+                Debug.Log("Friend request sent successfully!");
+            }
+        }
+        else
+        {
+            friendRequestStatusText.text = "Usuario no encontrado.";
+            Debug.LogWarning("User not found");
+        }
+    }
 }
 
 
