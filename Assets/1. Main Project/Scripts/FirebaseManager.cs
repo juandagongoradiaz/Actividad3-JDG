@@ -150,7 +150,7 @@ public class FirebaseManager : MonoBehaviour
             FirebaseException firebaseEx = LoginTask.Exception.GetBaseException() as FirebaseException;
             AuthError errorCode = (AuthError)firebaseEx.ErrorCode;
 
-            string message = "¡Ingreso Fallido!";
+            string message = "Ingreso Fallido";
             switch (errorCode)
             {
                 case AuthError.MissingEmail:
