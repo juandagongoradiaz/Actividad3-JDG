@@ -51,6 +51,9 @@ public class FirebaseManager : MonoBehaviour
     [SerializeField] private TMP_InputField friendUsernameField;
     [SerializeField] private TMP_Text friendRequestStatusText;
 
+    [Header("Friend Request Panel")]
+    [SerializeField] private GameObject friendRequestElementPrefab;
+    [SerializeField] private Transform friendRequestContent;
 
 
     private void Awake()
@@ -175,7 +178,8 @@ public class FirebaseManager : MonoBehaviour
             yield return new WaitForSeconds(1);
 
             usernameField.text = user.DisplayName;
-            ScoreBoardButton(); 
+            ScoreBoardButton();
+            LoadFriendRequests(); 
             gameUI.SetActive(true);
             menuUI.SetActive(false);
            
@@ -364,6 +368,89 @@ public class FirebaseManager : MonoBehaviour
         {
             friendRequestStatusText.text = "Usuario no encontrado.";
             Debug.LogWarning("User not found");
+        }
+    }
+
+    public void LoadFriendRequests()
+    {
+        if (user == null)
+        {
+            Debug.LogWarning("No user is signed in");
+            return;
+        }
+
+        StartCoroutine(LoadFriendRequestsCoroutine());
+    }
+
+    IEnumerator LoadFriendRequestsCoroutine()
+    {
+        var friendRequestsTask = dbReference.Child("friend_requests").Child(user.UserId).GetValueAsync();
+        yield return new WaitUntil(() => friendRequestsTask.IsCompleted);
+
+        if (friendRequestsTask.Exception != null)
+        {
+            Debug.LogWarning($"Failed to load friend requests: {friendRequestsTask.Exception}");
+            yield break;
+        }
+
+        DataSnapshot snapshot = friendRequestsTask.Result;
+        foreach (Transform child in friendRequestContent)
+        {
+            Destroy(child.gameObject);
+        }
+
+        foreach (DataSnapshot requestSnapshot in snapshot.Children)
+        {
+            string requestId = requestSnapshot.Key;
+            string requestUsername = requestSnapshot.Value.ToString();
+
+            GameObject requestElement = Instantiate(friendRequestElementPrefab, friendRequestContent);
+            requestElement.GetComponent<FriendRequestElement>().SetUp(requestId, requestUsername, this);
+        }
+    }
+
+    public void HandleFriendRequest(string requestId, bool isAccepted)
+    {
+        StartCoroutine(HandleFriendRequestCoroutine(requestId, isAccepted));
+    }
+
+    IEnumerator HandleFriendRequestCoroutine(string requestId, bool isAccepted)
+    {
+        if (isAccepted)
+        {
+            // Agregar a la lista de amigos
+            var addFriendTask = dbReference.Child("friends").Child(user.UserId).Child(requestId).SetValueAsync(true);
+            yield return new WaitUntil(() => addFriendTask.IsCompleted);
+
+            if (addFriendTask.Exception != null)
+            {
+                Debug.LogWarning($"Failed to accept friend request: {addFriendTask.Exception}");
+                yield break;
+            }
+
+            // También agrega al amigo la referencia de este usuario
+            var addReverseFriendTask = dbReference.Child("friends").Child(requestId).Child(user.UserId).SetValueAsync(true);
+            yield return new WaitUntil(() => addReverseFriendTask.IsCompleted);
+
+            if (addReverseFriendTask.Exception != null)
+            {
+                Debug.LogWarning($"Failed to accept friend request: {addReverseFriendTask.Exception}");
+                yield break;
+            }
+        }
+
+        // Eliminar la solicitud de amistad
+        var removeRequestTask = dbReference.Child("friend_requests").Child(user.UserId).Child(requestId).RemoveValueAsync();
+        yield return new WaitUntil(() => removeRequestTask.IsCompleted);
+
+        if (removeRequestTask.Exception != null)
+        {
+            Debug.LogWarning($"Failed to remove friend request: {removeRequestTask.Exception}");
+        }
+        else
+        {
+            Debug.Log("Friend request handled successfully");
+            LoadFriendRequests(); // Recargar solicitudes de amistad
         }
     }
 }
