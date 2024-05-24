@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using Firebase;
 using Firebase.Auth;
@@ -76,6 +77,7 @@ public class FirebaseManager : MonoBehaviour
             }
         });
     }
+    
 
     private void AuthStateChanged(object sender, System.EventArgs eventArgs)
     {
@@ -101,6 +103,30 @@ public class FirebaseManager : MonoBehaviour
     {
         dbReference.Child("friend_requests").Child(user.UserId).ValueChanged += HandleFriendRequestsChanged;
         dbReference.Child("friends").Child(user.UserId).ValueChanged += HandleFriendsChanged;
+        dbReference.Child("users").ValueChanged += HandleUsersChanged; // Añadir esta línea
+    }
+
+    private void HandleUsersChanged(object sender, ValueChangedEventArgs args)
+    {
+        if (args.DatabaseError != null)
+        {
+            Debug.LogError(args.DatabaseError.Message);
+            return;
+        }
+
+        UpdateUserList(args.Snapshot); // Método que actualizará la lista de usuarios
+    }
+
+    private List<DataSnapshot> userList = new List<DataSnapshot>(); // Lista para almacenar los usuarios
+
+    private void UpdateUserList(DataSnapshot snapshot)
+    {
+        userList.Clear(); // Limpiar la lista de usuarios antes de actualizar
+
+        foreach (DataSnapshot userSnapshot in snapshot.Children)
+        {
+            userList.Add(userSnapshot); // Añadir cada usuario a la lista
+        }
     }
 
     private void HandleFriendRequestsChanged(object sender, ValueChangedEventArgs args)
@@ -334,14 +360,12 @@ public class FirebaseManager : MonoBehaviour
             yield break;
         }
 
-        // Buscar el usuario en la base de datos
-        var userQuery = dbReference.Child("users").OrderByChild("username").EqualTo(friendUsername).GetValueAsync();
-        yield return new WaitUntil(() => userQuery.IsCompleted);
+        // Buscar el usuario en la lista actualizada de usuarios
+        var userSnapshot = userList.FirstOrDefault(u => u.Child("username").Value.ToString() == friendUsername);
 
-        if (userQuery.Result.Exists && userQuery.Result.Children.Count() > 0)
+        if (userSnapshot != null)
         {
-            DataSnapshot snapshot = userQuery.Result.Children.FirstOrDefault();
-            string friendUserId = snapshot.Key;
+            string friendUserId = userSnapshot.Key;
 
             // Enviar la solicitud de amistad
             var friendRequestTask = dbReference.Child("friend_requests").Child(friendUserId).Child(user.UserId).SetValueAsync(user.DisplayName);
