@@ -92,8 +92,37 @@ public class FirebaseManager : MonoBehaviour
             {
                 // El usuario ha iniciado sesión
                 dbReference.Child("users").Child(user.UserId).Child("status").SetValueAsync(true);
+                AddRealtimeListeners(); // Agrega los escuchas en tiempo real
             }
         }
+    }
+
+    private void AddRealtimeListeners()
+    {
+        dbReference.Child("friend_requests").Child(user.UserId).ValueChanged += HandleFriendRequestsChanged;
+        dbReference.Child("friends").Child(user.UserId).ValueChanged += HandleFriendsChanged;
+    }
+
+    private void HandleFriendRequestsChanged(object sender, ValueChangedEventArgs args)
+    {
+        if (args.DatabaseError != null)
+        {
+            Debug.LogError(args.DatabaseError.Message);
+            return;
+        }
+
+        LoadFriendRequests();
+    }
+
+    private void HandleFriendsChanged(object sender, ValueChangedEventArgs args)
+    {
+        if (args.DatabaseError != null)
+        {
+            Debug.LogError(args.DatabaseError.Message);
+            return;
+        }
+
+        LoadFriendList();
     }
 
     void InitializeFirebase()
@@ -454,7 +483,6 @@ public class FirebaseManager : MonoBehaviour
         {
             string friendId = friendSnapshot.Key;
 
-
             // Get friend's username
             var friendUsernameTask = dbReference.Child("users").Child(friendId).Child("username").GetValueAsync();
             yield return new WaitUntil(() => friendUsernameTask.IsCompleted);
@@ -490,13 +518,8 @@ public class FirebaseManager : MonoBehaviour
                         GameObject notificationInstance = Instantiate(notificationPrefab, notificationTransform);
                         NotificationScript notificationScript = notificationInstance.GetComponent<NotificationScript>();
                         notificationScript.SetUp(friendUsername);
+                        notificationScript.SetStatus(true); // Asegúrate de establecer el estado
                     }
-                }
-                else
-                {
-                    Debug.LogWarning("El nodo 'status' para este amigo está vacío o no existe.");
-                    // Aquí puedes manejar el caso en el que el nodo 'status' esté vacío o no exista
-                    // Por ejemplo, podrías establecer el estado en línea como desconocido o fuera de línea
                 }
             };
         }

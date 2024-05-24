@@ -1,9 +1,6 @@
 using System.Collections;
 using UnityEngine;
 using TMPro;
-
-
-
 public class NotificationScript : MonoBehaviour
 {
     [SerializeField] private TMP_Text usernameText;
@@ -20,5 +17,4 @@ public class NotificationScript : MonoBehaviour
     {
         statusText.text = isOnline ? "Se ha conectado" : "Se ha desconectado";
     }
-
 }
